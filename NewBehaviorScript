@@ -4,12 +4,12 @@ using UnityEngine;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TMPro;
-using TextMeshProUGUI responseText;
 
 public class NewBehaviourScript : MonoBehaviour
 {
     private readonly string apiKey = "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";
     private readonly string apiURL = "https://api.openai.com/v1/chat/completions";
+    public TextMeshProUGUI responseText;
 
     // Start is called before the first frame update
     async void Start()
