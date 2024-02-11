@@ -23,26 +23,43 @@ public class NewBehaviourScript : MonoBehaviour
         
     }
 
-    public async Task<string> GetChatGPTResponse(string prompt)
+public async Task<string> GetChatGPTResponse(string prompt)
+{
+    using (HttpClient client = new HttpClient())
     {
-        using (HttpClient client = new HttpClient())
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+        var requestData = new
         {
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+            model = "text-davinci-003",
+            prompt = prompt,
+            temperature = 0.5,
+            max_tokens = 100
+        };
+        string json = JsonUtility.ToJson(requestData);
 
-            var requestData = new
-            {
-                model = "text-davinci-003",
-                prompt = prompt,
-                temperature = 0.5,
-                max_tokens = 100
-            };
-            string json = JsonUtility.ToJson(requestData);
+        HttpResponseMessage response = await client.PostAsync(apiURL,
+            new StringContent(json, System.Text.Encoding.UTF8, "application/json"));
 
-            HttpResponseMessage response = await client.PostAsync(apiURL,
-                new StringContent(json, System.Text.Encoding.UTF8, "application/json"));
-
-            string result = await response.Content.ReadAsStringAsync();
-            return result;
-        }
+        string result = await response.Content.ReadAsStringAsync();
+        // Assuming the API response structure and parsing it accordingly
+        // You'll need to parse the JSON response to extract the actual text
+        var responseObject = JsonUtility.FromJson<Response>(result);
+        responseText.text = responseObject.choices[0].text; // Update the UI Text element
+        return result;
     }
+}
+
+[System.Serializable]
+public class Response
+{
+    public Choice[] choices;
+}
+
+[System.Serializable]
+public class Choice
+{
+    public string text;
+}
+
 }
